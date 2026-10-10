@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ZOVARNIX — Engineering the Unseen</title>
+<meta name="description" content="ZOVARNIX — intelligent technology, AI, software engineering, data and automation." />
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<style>
+:root{
+  --bg:#030504; --panel:#07100b; --green:#39ff88; --green2:#11c968;
+  --text:#f2fff7; --muted:#91a99b; --line:rgba(57,255,136,.14);
+  --glow:0 0 30px rgba(57,255,136,.22);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+canvas{position:fixed;inset:0;z-index:0;pointer-events:none}
+#intro{position:fixed;inset:0;background:#020403;z-index:100;display:grid;place-items:center;overflow:hidden;pointer-events:auto;opacity:1;visibility:visible}
+#intro.is-done{animation:introExit 1.05s cubic-bezier(.2,.75,.2,1) forwards;pointer-events:none}
+@keyframes introExit{0%{opacity:1;visibility:visible;transform:scale(1)}65%{opacity:1;transform:scale(1.025)}100%{opacity:0;visibility:hidden;transform:scale(1.08);pointer-events:none}}
+.intro-grid{position:absolute;inset:-30%;background:
+linear-gradient(rgba(57,255,136,.06) 1px,transparent 1px),
+linear-gradient(90deg,rgba(57,255,136,.06) 1px,transparent 1px);
+background-size:70px 70px;transform:perspective(700px) rotateX(65deg) translateY(18%);animation:gridMove 5s linear infinite}
+@keyframes gridMove{to{background-position:0 70px,0 0}}
+.intro-core{width:190px;height:190px;border:1px solid rgba(57,255,136,.5);border-radius:50%;position:relative;box-shadow:0 0 80px rgba(57,255,136,.15),inset 0 0 50px rgba(57,255,136,.08);display:grid;place-items:center}
+.intro-core:before,.intro-core:after{content:"";position:absolute;border:1px solid rgba(57,255,136,.25);border-radius:50%;inset:20px;animation:spin 4s linear infinite}
+.intro-core:after{inset:42px;animation-direction:reverse;animation-duration:2.5s}
+@keyframes spin{to{transform:rotate(360deg)}}
+.intro-word{font-size:clamp(1.4rem,4vw,3rem);font-weight:800;letter-spacing:.28em;color:var(--green);text-shadow:0 0 25px rgba(57,255,136,.7);margin-left:.28em}
+.intro-status{position:absolute;bottom:12%;font:500 .72rem/1 monospace;letter-spacing:.35em;color:#789384;text-transform:uppercase}
+nav{position:fixed;top:0;left:0;right:0;z-index:20;padding:22px 6vw;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(180deg,rgba(3,5,4,.9),transparent);backdrop-filter:blur(6px)}
+.logo{font-weight:900;letter-spacing:.16em}.logo span{color:var(--green)}
+.navlinks{display:flex;gap:30px;color:#a7b9ae;font-size:.82rem}
+.navlinks a{transition:.25s}.navlinks a:hover{color:var(--green)}
+.navbtn{border:1px solid rgba(57,255,136,.3);padding:10px 16px;border-radius:999px;color:var(--green);font-size:.78rem}
+main{position:relative;z-index:2}
+section{padding:110px 7vw;position:relative}
+.hero{min-height:100vh;display:flex;align-items:center;padding-top:130px;overflow:hidden}
+.hero:before{content:"";position:absolute;width:650px;height:650px;right:-180px;top:12%;background:radial-gradient(circle,rgba(57,255,136,.16),transparent 65%);filter:blur(20px)}
+.hero-copy{max-width:850px}
+.eyebrow{display:inline-flex;align-items:center;gap:10px;color:var(--green);font:600 .74rem/1 monospace;letter-spacing:.2em;text-transform:uppercase;margin-bottom:22px}
+.dot{width:7px;height:7px;background:var(--green);border-radius:50%;box-shadow:0 0 16px var(--green)}
+h1{font-size:clamp(4rem,10vw,9.5rem);line-height:.86;letter-spacing:-.075em;font-weight:900}
+h1 em{font-style:normal;color:transparent;-webkit-text-stroke:1px rgba(242,255,247,.5)}
+.hero p{max-width:660px;margin:30px 0;color:var(--muted);font-size:1.08rem;line-height:1.8}
+.actions{display:flex;gap:14px;flex-wrap:wrap}
+.btn{padding:14px 21px;border-radius:10px;font-weight:700;font-size:.86rem;transition:.3s;display:inline-flex;align-items:center;gap:9px}
+.btn.primary{background:var(--green);color:#031007;box-shadow:0 0 30px rgba(57,255,136,.2)}
+.btn.primary:hover{transform:translateY(-3px);box-shadow:0 0 45px rgba(57,255,136,.35)}
+.btn.ghost{border:1px solid var(--line);color:#cde1d4;background:rgba(255,255,255,.02)}
+.btn.ghost:hover{border-color:rgba(57,255,136,.5);color:var(--green)}
+.scroll{position:absolute;bottom:35px;left:7vw;color:#668072;font:600 .68rem monospace;letter-spacing:.2em;writing-mode:vertical-rl}
+.scroll:after{content:"";display:block;width:1px;height:65px;background:linear-gradient(var(--green),transparent);margin:10px auto}
+.kicker{font:700 .72rem monospace;letter-spacing:.25em;color:var(--green);text-transform:uppercase;margin-bottom:15px}
+h2{font-size:clamp(2.2rem,5vw,4.6rem);letter-spacing:-.055em;line-height:1}
+.lead{color:var(--muted);max-width:650px;line-height:1.8;margin-top:22px}
+.grid{display:grid;gap:18px}
+.services{grid-template-columns:repeat(4,1fr);margin-top:55px}
+.card{background:linear-gradient(145deg,rgba(11,24,16,.9),rgba(5,10,7,.7));border:1px solid var(--line);border-radius:20px;padding:28px;min-height:230px;transition:transform .4s,border-color .4s,box-shadow .4s;position:relative;overflow:hidden}
+.card:before{content:"";position:absolute;width:130px;height:130px;right:-50px;top:-50px;background:radial-gradient(circle,rgba(57,255,136,.14),transparent 70%)}
+.card:hover{transform:translateY(-8px);border-color:rgba(57,255,136,.38);box-shadow:var(--glow)}
+.icon{font-size:1.5rem;color:var(--green);margin-bottom:50px}
+.card h3{font-size:1.15rem;margin-bottom:10px}.card p{color:var(--muted);line-height:1.6;font-size:.9rem}
+.stats{grid-template-columns:repeat(4,1fr);margin-top:65px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.stat{padding:30px 20px;border-right:1px solid var(--line)}.stat:last-child{border-right:0}
+.stat b{font-size:2.2rem;color:var(--green)}.stat span{display:block;color:#7e9587;font-size:.78rem;margin-top:6px}
+.projects{grid-template-columns:repeat(2,1fr);margin-top:55px}
+.project{min-height:360px;border:1px solid var(--line);border-radius:24px;padding:32px;display:flex;flex-direction:column;justify-content:flex-end;position:relative;overflow:hidden;background:#050a07}
+.project:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 70% 30%,rgba(57,255,136,.18),transparent 35%),linear-gradient(135deg,rgba(57,255,136,.04),transparent 50%)}
+.project > *{position:relative}
+.project .num{font:700 .7rem monospace;color:var(--green);letter-spacing:.2em;margin-bottom:auto}
+.project h3{font-size:2rem;letter-spacing:-.04em;margin-bottom:10px}.project p{color:var(--muted);max-width:520px;line-height:1.6}
+.tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}.tag{border:1px solid var(--line);padding:6px 9px;border-radius:999px;color:#9fb4a6;font-size:.7rem}
+.stack{grid-template-columns:repeat(6,1fr);margin-top:45px}
+.tech{padding:20px 10px;text-align:center;border:1px solid var(--line);border-radius:14px;color:#a6b9ad;font:600 .78rem monospace;transition:.25s}
+.tech:hover{color:var(--green);border-color:rgba(57,255,136,.45);transform:translateY(-4px)}
+.cta{border:1px solid rgba(57,255,136,.2);border-radius:28px;background:radial-gradient(circle at 80% 20%,rgba(57,255,136,.13),transparent 35%),#06100a;padding:70px;display:flex;align-items:center;justify-content:space-between;gap:40px}
+.cta h2{max-width:720px}.cta p{color:var(--muted);margin-top:15px;max-width:620px}
+footer{padding:35px 7vw;border-top:1px solid var(--line);display:flex;justify-content:space-between;color:#61766a;font-size:.75rem}
+.reveal{opacity:0;transform:translateY(35px)}
+@media(max-width:900px){
+ .navlinks{display:none}.services,.stats{grid-template-columns:repeat(2,1fr)}
+ .projects{grid-template-columns:1fr}.stack{grid-template-columns:repeat(3,1fr)}
+ .cta{padding:45px 30px;display:block}.cta .btn{margin-top:25px}
+}
+@media(max-width:600px){
+ section{padding:80px 6vw}.hero{padding-top:110px}h1{font-size:19vw}
+ .services,.stats{grid-template-columns:1fr}.stat{border-right:0;border-bottom:1px solid var(--line)}
+ .stack{grid-template-columns:repeat(2,1fr)}.card{min-height:200px}
+ footer{display:block}footer span{display:block;margin-top:10px}
+}
+
+/* Percentage loading screen */
+.loader-wrap{position:relative;z-index:2;width:min(560px,82vw);text-align:center}
+.loader-brand{font-size:clamp(2rem,7vw,5rem);font-weight:900;letter-spacing:.22em;color:#fff;margin-left:.22em;text-shadow:0 0 30px rgba(57,255,136,.25)}
+.loader-brand span{color:var(--green)}
+.loader-number{margin-top:24px;font:600 clamp(2.5rem,8vw,5.5rem)/1 monospace;letter-spacing:-.08em;color:var(--green);text-shadow:0 0 30px rgba(57,255,136,.55)}
+.loader-label{margin-top:12px;color:#789384;font:500 .68rem/1 monospace;letter-spacing:.28em;text-transform:uppercase}
+.loader-track{height:2px;margin:28px auto 0;background:rgba(255,255,255,.09);overflow:hidden}
+.loader-bar{height:100%;width:0;background:var(--green);box-shadow:0 0 18px var(--green);transition:width .12s linear}
+.loader-corners{position:absolute;inset:7vw;pointer-events:none;border:1px solid rgba(57,255,136,.08)}
+.loader-corners:before,.loader-corners:after{content:"";position:absolute;width:55px;height:55px;border-color:var(--green);opacity:.45}
+.loader-corners:before{left:-1px;top:-1px;border-left:1px solid;border-top:1px solid}
+.loader-corners:after{right:-1px;bottom:-1px;border-right:1px solid;border-bottom:1px solid}
+
+</style>
+</head>
+<body>
+<div id="intro">
+  <div class="intro-grid"></div>
+  <div class="loader-corners"></div>
+  <div class="loader-wrap">
+    <div class="loader-brand"><span>Z</span>OVARNIX</div>
+    <div class="loader-number" id="loaderPercent">0%</div>
+    <div class="loader-label" id="loaderLabel">Initializing ZOVARNIX</div>
+    <div class="loader-track"><div class="loader-bar" id="loaderBar"></div></div>
+  </div>
+</div>
+
+<canvas id="scene"></canvas>
+
+<nav>
+  <a class="logo" href="#">ZOVARNIX</a>
+  <div class="navlinks">
+    <a href="#about">About</a><a href="#services">Capabilities</a><a href="#work">Projects</a><a href="#stack">Technology</a>
+  </div>
+  <a class="navbtn" href="#contact">Start a project</a>
+</nav>
+
+<main>
+<section class="hero">
+  <div class="hero-copy reveal">
+    <div class="eyebrow"><i class="dot"></i> AI • SOFTWARE • DATA • AUTOMATION</div>
+    <h1>Engineering<br><em>the Unseen.</em></h1>
+    <p>We design intelligent digital systems that turn complex ideas into scalable products — from AI and data platforms to modern web applications and automation.</p>
+    <div class="actions">
+      <a class="btn primary" href="#work">Explore our work ↗</a>
+      <a class="btn ghost" href="#contact">Build with Zovarnix</a>
+    </div>
+  </div>
+  <div class="scroll">SCROLL</div>
+</section>
+
+<section id="about">
+  <div class="reveal">
+    <div class="kicker">01 / Who we are</div>
+    <h2>Technology with<br><span style="color:var(--green)">intelligence.</span></h2>
+    <p class="lead">ZOVARNIX is a technology studio focused on AI engineering, software architecture, data intelligence and automation. We combine product thinking with modern engineering to build systems that are useful, fast and ready to scale.</p>
+  </div>
+  <div class="grid stats reveal">
+    <div class="stat"><b>AI</b><span>Intelligent systems</span></div>
+    <div class="stat"><b>∞</b><span>Scalable possibilities</span></div>
+    <div class="stat"><b>24/7</b><span>Automation mindset</span></div>
+    <div class="stat"><b>01</b><span>Unified technology vision</span></div>
+  </div>
+</section>
+
+<section id="services">
+  <div class="reveal">
+    <div class="kicker">02 / Capabilities</div>
+    <h2>Built across the<br>modern stack.</h2>
+  </div>
+  <div class="grid services">
+    <article class="card reveal"><div class="icon">◈</div><h3>Artificial Intelligence</h3><p>AI applications, intelligent agents, predictive systems, NLP and computer-vision workflows.</p></article>
+    <article class="card reveal"><div class="icon">⌘</div><h3>Full-Stack Engineering</h3><p>High-performance web platforms with React, Next.js, Node.js, APIs, databases and secure architecture.</p></article>
+    <article class="card reveal"><div class="icon">◉</div><h3>Data Intelligence</h3><p>Data pipelines, analytics, forecasting and decision systems that turn raw data into useful signals.</p></article>
+    <article class="card reveal"><div class="icon">⚡</div><h3>Automation</h3><p>Connect systems, remove repetitive work and create reliable AI-assisted business workflows.</p></article>
+  </div>
+</section>
+
+<section id="work">
+  <div class="reveal">
+    <div class="kicker">03 / Selected concepts</div>
+    <h2>Ideas built to<br><span style="color:var(--green)">move fast.</span></h2>
+  </div>
+  <div class="grid projects">
+    <article class="project reveal"><div class="num">PROJECT / 001</div><h3>Predictive Intelligence</h3><p>Forecasting platform that combines time-series signals, machine learning and interactive analytics.</p><div class="tags"><span class="tag">Python</span><span class="tag">TensorFlow</span><span class="tag">Time Series</span><span class="tag">Data</span></div></article>
+    <article class="project reveal"><div class="num">PROJECT / 002</div><h3>AI Automation Core</h3><p>Agent-ready workflow architecture for connecting business processes, APIs and intelligent decision layers.</p><div class="tags"><span class="tag">LLMs</span><span class="tag">Agents</span><span class="tag">Node.js</span><span class="tag">APIs</span></div></article>
+    <article class="project reveal"><div class="num">PROJECT / 003</div><h3>Next-Gen SaaS</h3><p>A scalable product foundation combining modern frontend engineering, authentication, payments and cloud APIs.</p><div class="tags"><span class="tag">Next.js</span><span class="tag">PostgreSQL</span><span class="tag">TypeScript</span><span class="tag">Cloud</span></div></article>
+    <article class="project reveal"><div class="num">PROJECT / 004</div><h3>Vision Intelligence</h3><p>Computer-vision pipelines designed to extract meaningful information from visual data in real time.</p><div class="tags"><span class="tag">Python</span><span class="tag">Computer Vision</span><span class="tag">ML</span><span class="tag">Automation</span></div></article>
+  </div>
+</section>
+
+<section id="stack">
+  <div class="reveal">
+    <div class="kicker">04 / Technology</div>
+    <h2>Our digital<br>toolbox.</h2>
+  </div>
+  <div class="grid stack reveal">
+    <div class="tech">React</div><div class="tech">Next.js</div><div class="tech">Node.js</div><div class="tech">Python</div><div class="tech">TensorFlow</div><div class="tech">PyTorch</div>
+    <div class="tech">PostgreSQL</div><div class="tech">MongoDB</div><div class="tech">TypeScript</div><div class="tech">Docker</div><div class="tech">AWS</div><div class="tech">LLMs</div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="cta reveal">
+    <div><div class="kicker">05 / Let's build</div><h2>Have an idea worth engineering?</h2><p>Let's turn ambitious concepts into intelligent products, platforms and experiences.</p></div>
+    <a class="btn primary" href="mailto:hello@zovarnix.com">hello@zovarnix.com ↗</a>
+  </div>
+</section>
+</main>
+
+<footer><strong>ZOVARNIX</strong><span>© 2026 ZOVARNIX. Engineering the Unseen.</span></footer>
+
+<script>
+/* Optional 3D background. The intro never depends on external libraries. */
+(function(){
+  const canvas=document.getElementById('scene');
+  if(!canvas || !window.THREE) return;
+  try {
+    const renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true});
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+    renderer.setSize(innerWidth,innerHeight);
+    const scene=new THREE.Scene();
+    const camera=new THREE.PerspectiveCamera(65,innerWidth/innerHeight,.1,1000);
+    camera.position.z=9;
+    const count=1800, positions=new Float32Array(count*3);
+    for(let i=0;i<count;i++){
+      const j=i*3, r=Math.pow(Math.random(),.55)*7, theta=Math.random()*Math.PI*2, phi=Math.acos(2*Math.random()-1);
+      positions[j]=r*Math.sin(phi)*Math.cos(theta);
+      positions[j+1]=r*Math.sin(phi)*Math.sin(theta);
+      positions[j+2]=r*Math.cos(phi)-1;
+    }
+    const geo=new THREE.BufferGeometry();
+    geo.setAttribute('position',new THREE.BufferAttribute(positions,3));
+    const mat=new THREE.PointsMaterial({color:0x39ff88,size:.025,transparent:true,opacity:.5,blending:THREE.AdditiveBlending});
+    const points=new THREE.Points(geo,mat); scene.add(points);
+    const ring=new THREE.Mesh(new THREE.TorusGeometry(2.2,.012,12,100),new THREE.MeshBasicMaterial({color:0x39ff88,transparent:true,opacity:.22}));
+    ring.rotation.x=Math.PI/2; scene.add(ring);
+    let mx=0,my=0;
+    addEventListener('pointermove',e=>{mx=(e.clientX/innerWidth-.5)*.7;my=(e.clientY/innerHeight-.5)*.5;});
+    function animate(t){
+      requestAnimationFrame(animate);
+      points.rotation.y=t*.00005+mx*.15; points.rotation.x=t*.000025+my*.1; ring.rotation.z=t*.00025;
+      renderer.render(scene,camera);
+    }
+    animate(0);
+    addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
+  } catch(e) { console.warn('3D background disabled:',e); }
+})();
+
+/* Percentage loader + scroll effects. No external library is required. */
+(function(){
+  const intro=document.getElementById('intro');
+  const percent=document.getElementById('loaderPercent');
+  const bar=document.getElementById('loaderBar');
+  const label=document.getElementById('loaderLabel');
+  const hero=document.querySelector('.hero-copy');
+  const start=performance.now();
+  const duration=3600;
+  let finished=false;
+  const labels=[
+    [0,'Initializing ZOVARNIX'],
+    [25,'Loading digital architecture'],
+    [50,'Connecting intelligent systems'],
+    [75,'Preparing the experience'],
+    [95,'Almost ready'],
+    [100,'Welcome to ZOVARNIX']
+  ];
+  function updateLabel(value){
+    let current=labels[0][1];
+    for(const item of labels){ if(value>=item[0]) current=item[1]; }
+    if(label) label.textContent=current;
+  }
+  function finish(){
+    if(finished) return;
+    finished=true;
+    if(percent) percent.textContent='100%';
+    if(bar) bar.style.width='100%';
+    updateLabel(100);
+    setTimeout(()=>{
+      if(intro) intro.classList.add('is-done');
+      revealHero();
+    },260);
+    setTimeout(()=>{ if(intro) intro.style.pointerEvents='none'; },1450);
+  }
+  function tick(now){
+    const raw=Math.min(1,(now-start)/duration);
+    // Smooth progress gives the loading screen a premium, deliberate feel.
+    const eased=1-Math.pow(1-raw,1.65);
+    const value=Math.min(100,Math.floor(eased*100));
+    if(percent) percent.textContent=value+'%';
+    if(bar) bar.style.width=value+'%';
+    updateLabel(value);
+    if(raw<1) requestAnimationFrame(tick);
+    else finish();
+  }
+  function revealHero(){
+    if(hero){
+      hero.style.transition='opacity .9s ease, transform .9s cubic-bezier(.2,.8,.2,1)';
+      hero.style.opacity='1';
+      hero.style.transform='translateY(0)';
+    }
+  }
+  if(hero){ hero.style.opacity='0'; hero.style.transform='translateY(35px)'; }
+  requestAnimationFrame(tick);
+
+  const observer=new IntersectionObserver(entries=>{
+    entries.forEach(entry=>{
+      if(!entry.isIntersecting) return;
+      entry.target.style.opacity='1';
+      entry.target.style.transform='translateY(0)';
+      observer.unobserve(entry.target);
+    });
+  },{threshold:.08});
+  document.querySelectorAll('.reveal').forEach((el,i)=>{
+    if(el===hero) return;
+    el.style.transition=`opacity .8s ${Math.min(i*.04,.4)}s ease, transform .8s ${Math.min(i*.04,.4)}s cubic-bezier(.2,.8,.2,1)`;
+    observer.observe(el);
+  });
+})();
+</script>
+</body>
+</html>
